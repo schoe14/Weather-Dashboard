@@ -18,22 +18,30 @@ displayWeather();
 
 // Find geolocation of user if possible
 function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
+    // if (navigator.geolocation) {
+    //     navigator.geolocation.getCurrentPosition(showPosition);
+    // }
+
+    if (!navigator.geolocation) {
+        if (localStorage.length == 0) $(".message").text('Geolocation is not supported by your browser').css("color", "red");
     } else {
-        return;
+        navigator.geolocation.getCurrentPosition(success, error);
     }
-}
 
-function showPosition(position) {
-    geoLat = position.coords.latitude;
-    geoLon = position.coords.longitude;
+    function error() {
+        if (localStorage.length == 0) $(".message").text('Unable to retrieve your location').css("color", "red");
+    }
 
-    // If geolocation data is available, call ajax using that information in query
-    api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + geoLat + "&lon=" + geoLon + "&APPID=" + api_key;
-    callingAjax();
+    function success(position) {
+        geoLat = position.coords.latitude;
+        geoLon = position.coords.longitude;
 
-    console.log("Latitude: " + geoLat + " Longitude: " + geoLon);
+        // If geolocation data is available, call ajax using that information in query
+        api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + geoLat + "&lon=" + geoLon + "&APPID=" + api_key;
+        callingAjax();
+
+        console.log("Latitude: " + geoLat + " Longitude: " + geoLon);
+    }
 }
 
 // Display initial layouts
@@ -62,29 +70,53 @@ function setLayouts() {
         `)
 }
 
-// If a user presses enter or click button, call ajax
-$("#inputSearch").keypress(function (e) {
-    var key = e.which;
-    if (key == 13) {
-        $("#searchBtn").click();
-        return false;
-    }
-});
+$(document).ready(function () {
 
-$("#searchBtn").on("click", function () {
-    $(".message").text("");
-    event.preventDefault();
-    let inputVal = $("#inputSearch").val().trim();
-    if (isNaN(inputVal)) {
-        inputVal = inputVal.charAt(0).toUpperCase() + inputVal.substring(1).toLowerCase();
-        api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + inputVal + "&APPID=" + api_key;
-    }
-    else {
-        api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?zip=" + inputVal + ",us" + "&APPID=" + api_key;
-    }
-    console.log(inputVal)
+    // If a user presses enter or click button, call ajax
+    $("#inputSearch").keypress(function (e) {
+        var key = e.which;
+        if (key == 13) {
+            $("#searchBtn").click();
+            return false;
+        }
+    });
 
-    callingAjax();
+    $("#searchBtn").on("click", function () {
+        $(".message").text("");
+        event.preventDefault();
+        let inputVal = $("#inputSearch").val().trim();
+        if (isNaN(inputVal)) {
+            inputVal = inputVal.charAt(0).toUpperCase() + inputVal.substring(1).toLowerCase();
+            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + inputVal + "&APPID=" + api_key;
+        }
+        else {
+            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?zip=" + inputVal + ",us" + "&APPID=" + api_key;
+        }
+        console.log(inputVal)
+
+        callingAjax();
+    })
+
+    // If a recent searched city is clicked, display that city's weather
+    $(document).on("click", ".card a", function () {
+        console.log($(this).text())
+        event.preventDefault();
+        let tempArr = {};
+        let arrToBeSaved = [];
+        let storedValues = JSON.parse(localStorage.getItem("data"));
+        arrToBeSaved = storedValues;
+        for (var i = 0; i < arrToBeSaved.length; i++) {
+            if (arrToBeSaved[i].today.name == $(this).text().trim() && arrToBeSaved[i].today.cityId == $(this).attr("data-index")) {
+                console.log(arrToBeSaved[i].today.cityId)
+                tempArr = arrToBeSaved[i];
+                arrToBeSaved.splice(i, 1);
+                arrToBeSaved.unshift(tempArr);
+                localStorage.setItem("data", JSON.stringify(arrToBeSaved));
+                displayWeather();
+            }
+        }
+    })
+
 })
 
 // This function initiates the first ajax call
@@ -135,9 +167,8 @@ function success_function3(response) {
 
     weatherObj.forecast = [];
 
-    for (var i = 4; i < response.list.length; i += 8) {
+    for (var i = 7; i < response.list.length; i += 8) {
         let date = moment(response.list[i].dt * 1000).format("MM/DD/YYYY");
-        console.log("dt: " + response.list[i].dt)
         let icon = response.list[i].weather[0].icon;
         let temp = ((response.list[i].main.temp - 273.15) * 1.80 + 32).toFixed(1);
         let humidity = response.list[i].main.humidity;
@@ -173,7 +204,6 @@ function saveToLocalStorage() {
 function displayWeather() {
     let storedValues = JSON.parse(localStorage.getItem("data"));
     if (storedValues == null) {
-        getLocation();
         return;
     }
     let todayValues = storedValues[0].today;
@@ -186,7 +216,10 @@ function displayWeather() {
     divRecent.text("");
 
     for (var i = 0; i < storedValues.length; i++) {
-        divRecent.append($("<div>").addClass("card").text(storedValues[i].today.name));
+        let newDiv = $("<div>").addClass("card");
+        newDiv.append($("<a href=#>").attr("data-index", storedValues[i].today.cityId).text(storedValues[i].today.name));
+        divRecent.append(newDiv);
+        // divRecent.append($("<div>").addClass("card").text(storedValues[i].today.name));
     }
 
     divToday.html(/*html*/`
@@ -223,6 +256,6 @@ function displayWeather() {
 
 // Display a message if user input is invalid to get through the first ajax call
 function error_function() {
-    $(".message").text("Type a valid city name");
+    $(".message").text("Type a valid city name or US zip code");
 }
 

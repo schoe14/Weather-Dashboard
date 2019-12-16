@@ -12,7 +12,7 @@ html, body {
     top: 0;
     z-index: 99;
     margin-bottom: 0 !important;
-    padding: 30px;
+    padding: 25px;
     background-color: #414159;
     color: wheat;
     font-size: 30px;
@@ -25,6 +25,10 @@ html, body {
 
 .row {
     min-height: 650px;
+}
+
+.divLeft {
+    margin-bottom: 20px;
 }
 
 label {
@@ -106,4 +110,12 @@ footer {
     color: wheat;
 }
 
-@media only screen and (max-width: 768px) {}
+@media only screen and (max-width: 380px) {
+    .jumbotron {
+        font-size: 25px;
+        padding: 20px;
+    }
+    .city {
+        font-size: 25px;
+    }
+}
