@@ -6,11 +6,13 @@ var api_queryWeather;
 var api_queryForecast;
 
 var weatherObj = {
-    today: { name: null, date: null, icon: null, temp: null, humidity: null, windSpeed: null, uvIndex: null, cityId: null },
+    queryMethod: null,
+    today: {
+        name: null, date: null, icon: null, temp: null, humidity: null, windSpeed: null, uvIndex: null, cityId: null,
+        lat: null, lon: null
+    },
     forecast: []
 };
-
-var uvIndex;
 
 setLayouts();
 getLocation();
@@ -18,18 +20,17 @@ displayWeather();
 
 // Find geolocation of user if possible
 function getLocation() {
-    // if (navigator.geolocation) {
-    //     navigator.geolocation.getCurrentPosition(showPosition);
-    // }
+
+    let data = JSON.parse(localStorage.getItem("data"));
 
     if (!navigator.geolocation) {
-        if (localStorage.length == 0) $(".message").text('Geolocation is not supported by your browser').css("color", "red");
+        if (data == null) $(".message").text('Geolocation is not supported by your browser').css("color", "red");
     } else {
         navigator.geolocation.getCurrentPosition(success, error);
     }
 
     function error() {
-        if (localStorage.length == 0) $(".message").text('Unable to retrieve your location').css("color", "red");
+        if (data == null) $(".message").text('Unable to retrieve your location').css("color", "red");
     }
 
     function success(position) {
@@ -38,6 +39,7 @@ function getLocation() {
 
         // If geolocation data is available, call ajax using that information in query
         api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + geoLat + "&lon=" + geoLon + "&APPID=" + api_key;
+        weatherObj.queryMethod = "Geolocation";
         callingAjax();
 
         console.log("Latitude: " + geoLat + " Longitude: " + geoLon);
@@ -93,28 +95,51 @@ $(document).ready(function () {
             api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?zip=" + inputVal + ",us" + "&APPID=" + api_key;
         }
         console.log(inputVal)
-
+        weatherObj.queryMethod = inputVal;
         callingAjax();
     })
 
     // If a recent searched city is clicked, display that city's weather
     $(document).on("click", ".card a", function () {
-        console.log($(this).text())
         event.preventDefault();
-        let tempArr = {};
-        let arrToBeSaved = [];
-        let storedValues = JSON.parse(localStorage.getItem("data"));
-        arrToBeSaved = storedValues;
-        for (var i = 0; i < arrToBeSaved.length; i++) {
-            if (arrToBeSaved[i].today.name == $(this).text().trim() && arrToBeSaved[i].today.cityId == $(this).attr("data-index")) {
-                console.log(arrToBeSaved[i].today.cityId)
-                tempArr = arrToBeSaved[i];
-                arrToBeSaved.splice(i, 1);
-                arrToBeSaved.unshift(tempArr);
-                localStorage.setItem("data", JSON.stringify(arrToBeSaved));
-                displayWeather();
-            }
+
+        // I tried to call ajax using lat and lon for realtime result, but it gave me a different output.
+        // e.g. At first, I searched zip code of 23238 (Henrico) and clicked the card displayed leftside which 
+        // it would call ajax with the city's latitude/longitude, resulted in a city name "Virginia".
+        // It recognized as a different city with the same latitude/longitude.
+        // I also tried to query with city id, but if I initially searched a city with zip code it always gave city id of 0.
+        // Querying a city name also gives inaccurate output like searching "Richmond" results in Richmond, Canada.
+
+        // api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + $(this).attr("data-index1") 
+        // + "&lon=" + $(this).attr("data-index2") + "&APPID=" + api_key;
+        // callingAjax();
+
+        if ($(this).attr("data-index") == "Geolocation") getLocation();
+        else if (isNaN($(this).attr("data-index"))) {
+            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + $(this).attr("data-index") + "&APPID=" + api_key;
         }
+        else {
+            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?zip=" + $(this).attr("data-index") + ",us" + "&APPID=" + api_key;
+        }
+        console.log(api_queryWeather)
+        weatherObj.queryMethod = $(this).attr("data-index");
+
+        callingAjax();
+
+
+        // let tempArr = {};
+        // let arrToBeSaved = [];
+        // let storedValues = JSON.parse(localStorage.getItem("data"));
+        // arrToBeSaved = storedValues;
+        // for (var i = 0; i < arrToBeSaved.length; i++) {
+        //     if (arrToBeSaved[i].today.name == $(this).text().trim() && arrToBeSaved[i].queryMethod == $(this).attr("data-index")) {
+        //         tempArr = arrToBeSaved[i];
+        //         arrToBeSaved.splice(i, 1);
+        //         arrToBeSaved.unshift(tempArr);
+        //         localStorage.setItem("data", JSON.stringify(arrToBeSaved));
+        //         displayWeather();
+        //     }
+        // }
     })
 
 })
@@ -134,15 +159,21 @@ function success_function1(response) {
 
     weatherObj.today.name = response.name;
     weatherObj.today.date = moment(response.dt * 1000).format("MM/DD/YYYY");
-    console.log(response.dt)
     weatherObj.today.icon = response.weather[0].icon;
     // F = (K - 273.15) * 1.80 + 32
     weatherObj.today.temp = ((response.main.temp - 273.15) * 1.80 + 32).toFixed(1);
     weatherObj.today.humidity = response.main.humidity;
     weatherObj.today.windSpeed = response.wind.speed;
     weatherObj.today.cityId = response.id;
+    weatherObj.today.lat = lat;
+    weatherObj.today.lon = lon;
 
-    api_queryForecast = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&APPID=" + api_key;
+    if (isNaN(weatherObj.queryMethod)) {
+        api_queryForecast = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&APPID=" + api_key;
+    }
+    else {
+        api_queryForecast = "http://api.openweathermap.org/data/2.5/forecast?zip=" + weatherObj.queryMethod + ",us" + "&APPID=" + api_key;
+    }
     let api_queryUvIndex = "http://api.openweathermap.org/data/2.5/uvi?appid=" + api_key + "&lat=" + lat + "&lon=" + lon;
 
     // Call the next ajax function using data from the first call
@@ -152,11 +183,8 @@ function success_function1(response) {
 // Collect uvindex data and call the next function
 function success_function2(response) {
     console.log(response);
-    uvIndex = response.value;
-    console.log("uvindex " + uvIndex);
+    var uvIndex = response.value;
     weatherObj.today.uvIndex = uvIndex;
-
-    console.log(weatherObj);
 
     $.ajax({ url: api_queryForecast, success: success_function3 });
 }
@@ -179,6 +207,11 @@ function success_function3(response) {
     saveToLocalStorage();
 }
 
+// Display a message if user input is invalid to get through the first ajax call
+function error_function() {
+    $(".message").text("Type a valid city name or US zip code");
+}
+
 // Retrieve data from local storage if any, add new data and store in local storage and run the next function
 function saveToLocalStorage() {
 
@@ -187,10 +220,10 @@ function saveToLocalStorage() {
     let storedValues = JSON.parse(localStorage.getItem("data"));
     if (storedValues !== null) arrToBeSaved = storedValues;
 
-    // Check if there is existing data with the same city name and city id
+    // Check if there is existing data with the same city name and latitude/longitude
     // If so, remove it
     for (var i = 0; i < arrToBeSaved.length; i++) {
-        if (arrToBeSaved[i].today.cityId == weatherObj.today.cityId &&
+        if (arrToBeSaved[i].today.lat == weatherObj.today.lat && arrToBeSaved[i].today.lon == weatherObj.today.lon &&
             arrToBeSaved[i].today.name == weatherObj.today.name) arrToBeSaved.splice(i, 1);
     }
 
@@ -217,9 +250,8 @@ function displayWeather() {
 
     for (var i = 0; i < storedValues.length; i++) {
         let newDiv = $("<div>").addClass("card");
-        newDiv.append($("<a href=#>").attr("data-index", storedValues[i].today.cityId).text(storedValues[i].today.name));
+        newDiv.append($("<a href=#>").attr("data-index", storedValues[i].queryMethod).text(storedValues[i].today.name));
         divRecent.append(newDiv);
-        // divRecent.append($("<div>").addClass("card").text(storedValues[i].today.name));
     }
 
     divToday.html(/*html*/`
@@ -252,10 +284,5 @@ function displayWeather() {
         divForecast.append(element.day);
         index++;
     })
-}
-
-// Display a message if user input is invalid to get through the first ajax call
-function error_function() {
-    $(".message").text("Type a valid city name or US zip code");
 }
 
