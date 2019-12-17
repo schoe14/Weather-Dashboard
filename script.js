@@ -221,10 +221,15 @@ function saveToLocalStorage() {
     if (storedValues !== null) arrToBeSaved = storedValues;
 
     // Check if there is existing data with the same city name and latitude/longitude
+    // Since latitude/longitude values are different depending on the query in the first ajax call, round down latitude/longitude
     // If so, remove it
     for (var i = 0; i < arrToBeSaved.length; i++) {
-        if (arrToBeSaved[i].today.lat == weatherObj.today.lat && arrToBeSaved[i].today.lon == weatherObj.today.lon &&
-            arrToBeSaved[i].today.name == weatherObj.today.name) arrToBeSaved.splice(i, 1);
+        console.log(Math.floor(arrToBeSaved[i].today.lat) + " " + Math.floor(weatherObj.today.lat))
+        if (Math.floor(arrToBeSaved[i].today.lat) == Math.floor(weatherObj.today.lat) &&
+            Math.floor(arrToBeSaved[i].today.lon) == Math.floor(weatherObj.today.lon) &&
+            arrToBeSaved[i].today.name == weatherObj.today.name) {
+            arrToBeSaved.splice(i, 1);
+        }
     }
 
     // Insert new data in the beginning of the array and store this array to local storage
