@@ -39,7 +39,7 @@ function getLocation() {
 
         // If geolocation data is available, call ajax using that information in query
         api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + geoLat + "&lon=" + geoLon + "&APPID=" + api_key;
-        weatherObj.queryMethod = "Geolocation";
+        weatherObj.queryMethod = "Geolocation " + geoLat + " " + geoLon;
         callingAjax();
 
         console.log("Latitude: " + geoLat + " Longitude: " + geoLon);
@@ -114,16 +114,22 @@ $(document).ready(function () {
         // + "&lon=" + $(this).attr("data-index2") + "&APPID=" + api_key;
         // callingAjax();
 
-        if ($(this).attr("data-index") == "Geolocation") getLocation();
+        if ($(this).attr("data-index").includes("Geolocation")) {
+            // I could just call getLocation() again, but a user who once turned on geolocation feature might have turned off
+            // by the time city is clicked
+            var temparr = $(this).attr("data-index").split(" ");
+            console.log(temparr);
+            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + temparr[1] + "&lon=" + temparr[2] + "&APPID=" + api_key;
+        }
         else if (isNaN($(this).attr("data-index"))) {
             api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + $(this).attr("data-index") + "&APPID=" + api_key;
         }
         else {
             api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?zip=" + $(this).attr("data-index") + ",us" + "&APPID=" + api_key;
         }
+        
         console.log(api_queryWeather)
         weatherObj.queryMethod = $(this).attr("data-index");
-
         callingAjax();
 
 
