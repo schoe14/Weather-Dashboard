@@ -103,9 +103,9 @@ $(document).ready(function () {
         if ($(this).attr("data-index").includes("Geolocation")) {
             // I could just call getLocation() again, but a user who once turned on geolocation feature might have turned off
             // by the time city is clicked
-            var temparr = $(this).attr("data-index").split(" ");
-            console.log(temparr);
-            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + temparr[1] + "&lon=" + temparr[2] + "&APPID=" + api_key;
+            var tempArr = $(this).attr("data-index").split(" ");
+            console.log(tempArr);
+            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + tempArr[1] + "&lon=" + tempArr[2] + "&APPID=" + api_key;
         }
         else if (isNaN($(this).attr("data-index"))) {
             api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + $(this).attr("data-index") + "&APPID=" + api_key;
