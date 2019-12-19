@@ -5,8 +5,8 @@
 :sun_with_face: Accurate weather predictions are important for planning our day-to-day activities. :tractor: Farmers need information to help them plan for the planting and harvesting of their crops. :airplane: Airlines need to know about local weather conditions in order to schedule flights.
 
 # Screenshots
-<a href="https://schoe14.github.io/Weather-Dashboard/"><img src="https://schoe14.github.io/Weather-Dashboard/blob/master/assets/screenshot2.JPG" style="float: left"></a>
-<a href="https://schoe14.github.io/Weather-Dashboard/"><img src="https://schoe14.github.io/Weather-Dashboard/blob/master/assets/screenshot1.JPG" style="float: left"></a>
+<a href="https://schoe14.github.io/Weather-Dashboard/"><img src="https://github.com/schoe14/Weather-Dashboard/blob/master/assets/screenshots/screenshot2.JPG" style="float: left"></a>
+<a href="https://schoe14.github.io/Weather-Dashboard/"><img src="https://github.com/schoe14/Weather-Dashboard/blob/master/assets/screenshots/screenshot1.JPG" style="float: left"></a>
 
 # Tech/framework used
 * JavaScript

@@ -38,7 +38,7 @@ function getLocation() {
         api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + geoLat + "&lon=" + geoLon + "&APPID=" + api_key;
         weatherObj.queryMethod = "Geolocation " + geoLat + " " + geoLon;
         callingAjax();
-
+        console.log(api_queryWeather);
         console.log("Latitude: " + geoLat + " Longitude: " + geoLon);
     }
 }
@@ -91,7 +91,7 @@ $(document).ready(function () {
         else {
             api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?zip=" + inputVal + ",us" + "&APPID=" + api_key;
         }
-        console.log(inputVal)
+        console.log(inputVal);
         weatherObj.queryMethod = inputVal;
         callingAjax();
     })
@@ -114,7 +114,7 @@ $(document).ready(function () {
             api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?zip=" + $(this).attr("data-index") + ",us" + "&APPID=" + api_key;
         }
 
-        console.log(api_queryWeather)
+        console.log(api_queryWeather);
         weatherObj.queryMethod = $(this).attr("data-index");
         callingAjax();
 
@@ -180,7 +180,7 @@ function success_function3(response) {
         let humidity = response.list[i].main.humidity;
         weatherObj.forecast.push({ "date": date, "icon": icon, "temp": temp, "humidity": humidity });
     }
-    console.log(weatherObj)
+    console.log(weatherObj);
 
     saveToLocalStorage();
 }
