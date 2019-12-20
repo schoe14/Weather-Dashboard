@@ -125,7 +125,7 @@ $(document).ready(function () {
 // This function initiates the first ajax call
 // If the user input is valid, call success_function1 otherwise call error_function
 function callingAjax() {
-    $.ajax({ url: api_queryWeather, success: success_function1, error: error_function });
+    $.ajax({ url: api_queryWeather, success: success_function1, error: error_function, method: "GET" });
 }
 
 // Get current weather information from the call and store data in variables and objects for the future use
@@ -155,7 +155,7 @@ function success_function1(response) {
     let api_queryUvIndex = "http://api.openweathermap.org/data/2.5/uvi?appid=" + api_key + "&lat=" + lat + "&lon=" + lon;
 
     // Call the next ajax function using data from the first call
-    $.ajax({ url: api_queryUvIndex, success: success_function2 });
+    $.ajax({ url: api_queryUvIndex, success: success_function2, method: "GET" });
 }
 
 // Collect uvindex data and call the next function
@@ -164,7 +164,7 @@ function success_function2(response) {
     var uvIndex = response.value;
     weatherObj.today.uvIndex = uvIndex;
 
-    $.ajax({ url: api_queryForecast, success: success_function3 });
+    $.ajax({ url: api_queryForecast, success: success_function3, method: "GET" });
 }
 
 // Collect 5-day forecast data and go to the next function
