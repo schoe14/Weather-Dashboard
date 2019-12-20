@@ -249,7 +249,7 @@ function displayWeather() {
     $(".temp").append("Temperature: " + todayValues.temp + " °F");
     $(".humidity").append("Humidity: " + todayValues.humidity + " %");
     $(".wind").append("Wind Speed: " + todayValues.windSpeed + " MPH");
-    $(".uvIndex").append("UV Undex: " + todayValues.uvIndex);
+    $(".uvIndex").append("UV Index: " + todayValues.uvIndex);
 
     divForecast.html("");
 
