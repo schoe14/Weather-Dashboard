@@ -35,7 +35,7 @@ function getLocation() {
         var geoLon = position.coords.longitude;
 
         // If geolocation data is available, call ajax using that information in query
-        api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + geoLat + "&lon=" + geoLon + "&APPID=" + api_key;
+        api_queryWeather = "https://api.openweathermap.org/data/2.5/weather?lat=" + geoLat + "&lon=" + geoLon + "&APPID=" + api_key;
         weatherObj.queryMethod = "Geolocation " + geoLat + " " + geoLon;
         callingAjax();
         console.log(api_queryWeather);
@@ -86,10 +86,10 @@ $(document).ready(function () {
         let inputVal = $("#inputSearch").val().trim();
         if (isNaN(inputVal)) {
             inputVal = inputVal.charAt(0).toUpperCase() + inputVal.substring(1).toLowerCase();
-            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + inputVal + "&APPID=" + api_key;
+            api_queryWeather = "https://api.openweathermap.org/data/2.5/weather?q=" + inputVal + "&APPID=" + api_key;
         }
         else {
-            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?zip=" + inputVal + ",us" + "&APPID=" + api_key;
+            api_queryWeather = "https://api.openweathermap.org/data/2.5/weather?zip=" + inputVal + ",us" + "&APPID=" + api_key;
         }
         console.log(inputVal);
         weatherObj.queryMethod = inputVal;
@@ -105,13 +105,13 @@ $(document).ready(function () {
             // by the time city is clicked
             var tempArr = $(this).attr("data-index").split(" ");
             console.log(tempArr);
-            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?lat=" + tempArr[1] + "&lon=" + tempArr[2] + "&APPID=" + api_key;
+            api_queryWeather = "https://api.openweathermap.org/data/2.5/weather?lat=" + tempArr[1] + "&lon=" + tempArr[2] + "&APPID=" + api_key;
         }
         else if (isNaN($(this).attr("data-index"))) {
-            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?q=" + $(this).attr("data-index") + "&APPID=" + api_key;
+            api_queryWeather = "https://api.openweathermap.org/data/2.5/weather?q=" + $(this).attr("data-index") + "&APPID=" + api_key;
         }
         else {
-            api_queryWeather = "http://api.openweathermap.org/data/2.5/weather?zip=" + $(this).attr("data-index") + ",us" + "&APPID=" + api_key;
+            api_queryWeather = "https://api.openweathermap.org/data/2.5/weather?zip=" + $(this).attr("data-index") + ",us" + "&APPID=" + api_key;
         }
 
         console.log(api_queryWeather);
@@ -147,12 +147,12 @@ function success_function1(response) {
     weatherObj.today.lon = lon;
 
     if (isNaN(weatherObj.queryMethod)) {
-        api_queryForecast = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&APPID=" + api_key;
+        api_queryForecast = "https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&APPID=" + api_key;
     }
     else {
-        api_queryForecast = "http://api.openweathermap.org/data/2.5/forecast?zip=" + weatherObj.queryMethod + ",us" + "&APPID=" + api_key;
+        api_queryForecast = "https://api.openweathermap.org/data/2.5/forecast?zip=" + weatherObj.queryMethod + ",us" + "&APPID=" + api_key;
     }
-    let api_queryUvIndex = "http://api.openweathermap.org/data/2.5/uvi?appid=" + api_key + "&lat=" + lat + "&lon=" + lon;
+    let api_queryUvIndex = "https://api.openweathermap.org/data/2.5/uvi?appid=" + api_key + "&lat=" + lat + "&lon=" + lon;
 
     // Call the next ajax function using data from the first call
     $.ajax({ url: api_queryUvIndex, success: success_function2, method: "GET" });
@@ -244,7 +244,7 @@ function displayWeather() {
         <div class="uvIndex"></div>
         `)
 
-    $(".city").append(todayValues.name + " (" + todayValues.date + ") " + "<img src =http://openweathermap.org/img/wn/" +
+    $(".city").append(todayValues.name + " (" + todayValues.date + ") " + "<img src =https://openweathermap.org/img/wn/" +
         todayValues.icon + "@2x.png>");
     $(".temp").append("Temperature: " + todayValues.temp + " °F");
     $(".humidity").append("Humidity: " + todayValues.humidity + " %");
@@ -259,7 +259,7 @@ function displayWeather() {
 
     forecastArr.forEach(function (element) {
         element.day.append($("<div>").addClass("date").append(forecastedValues[index].date));
-        element.day.append($("<div>").addClass("icon").append("<img src =http://openweathermap.org/img/wn/" +
+        element.day.append($("<div>").addClass("icon").append("<img src =https://openweathermap.org/img/wn/" +
             forecastedValues[index].icon + "@2x.png>"));
         element.day.append($("<div>").addClass("temp").append("Temp: " + forecastedValues[index].temp + " °F"));
         element.day.append($("<div>").addClass("humidity").append("Humidity: " + forecastedValues[index].humidity + " %"));
